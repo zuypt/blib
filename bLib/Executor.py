@@ -96,10 +96,10 @@ class Executor():
 			'''
 			time.sleep(1) # wait for target process to terminate 
 			if psutil.pid_exists(self.pid):
+				self.kill()
 				self.logger.info('timeout')
 				return FAULT_TMOUT
 			else:
-				self.kill()
 				self.logger.error('client is dead')
 				return FAULT_ERROR
 		else:
@@ -112,6 +112,8 @@ class Executor():
 		while psutil.pid_exists(self.pid):
 			frida.kill(self.pid)
 		CleanupPipe()
+		
+		self.logger.info('Process {} is killed'.format(self.pid))
 
 	def write_inp_to_file(self, cur_inp):
 		try:
