@@ -96,6 +96,7 @@ class Executor():
 			'''
 			time.sleep(1) # wait for target process to terminate 
 			if psutil.pid_exists(self.pid):
+				self.kill()
 				self.logger.info('timeout')
 				self.kill()
 				return FAULT_TMOUT
@@ -112,6 +113,8 @@ class Executor():
 		while psutil.pid_exists(self.pid):
 			frida.kill(self.pid)
 		CleanupPipe()
+		
+		self.logger.info('Process {} is killed'.format(self.pid))
 
 	def write_inp_to_file(self, cur_inp):
 		try:

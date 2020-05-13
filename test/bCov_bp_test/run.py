@@ -86,7 +86,7 @@ class Server(FuzzServer):
 					interval = self.endtime-self.starttime
 					self.starttime = self.endtime
 
-					print (50/interval)
+					print ('exec/s: ', 50 / interval)
 
 fuzzserver = Server(args, **options)
 fuzzserver.start()
