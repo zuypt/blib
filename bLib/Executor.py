@@ -18,7 +18,10 @@ class Executor():
 
 		self.bcov = bcov
 		self.args = args
-		self.pipe_name = options.get('pipe_name', 'Fuzzer1')
+
+		self.id = options.get('id', 'Fuzzer1')
+
+		self.pipe_name = 'pipe_%s' % self.id
 
 		self.js_runtime = options.get('js_runtime', 'duk') 
 
@@ -98,7 +101,6 @@ class Executor():
 			if psutil.pid_exists(self.pid):
 				self.kill()
 				self.logger.info('timeout')
-				self.kill()
 				return FAULT_TMOUT
 			else:
 				self.logger.error('client is dead')

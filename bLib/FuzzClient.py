@@ -40,4 +40,5 @@ class FuzzClient(ABC):
 		else:
 			self.inp_sync = False
 
-		self.exec_one = self.__start_process
+		
+
