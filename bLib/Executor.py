@@ -97,9 +97,9 @@ class Executor():
 			time.sleep(1) # wait for target process to terminate 
 			if psutil.pid_exists(self.pid):
 				self.logger.info('timeout')
+				self.kill()
 				return FAULT_TMOUT
 			else:
-				self.kill()
 				self.logger.error('client is dead')
 				return FAULT_ERROR
 		else:
