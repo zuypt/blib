@@ -1,0 +1,3 @@
+include bLib/frida_scripts/*
+include bLib/clib/bin32/Release/*
+include bLib/clib/bin64/Release/*
