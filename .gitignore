@@ -1,4 +1,4 @@
-_pycache_/
+__pycache__/
 bLib.egg-info/
 build/
 build32/
@@ -7,3 +7,4 @@ dist/
 test/bCov_bp_test/out
 test/build32/
 test/build64/
+test/bCov_bp_test/test.mp3
