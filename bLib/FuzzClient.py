@@ -7,8 +7,8 @@ class FuzzClient(ABC):
 		self.logger.setLevel(self.log_level)
 
 		self.args = args
-		self.pipe_name = options.get('pipe_name', 'Fuzzer1')
-
+		self.id = options.get('id', 'Fuzzer1')
+		self.pipe_name = 'pipe_%s' % self.id
 		self.js_runtime = options.get('js_runtime', 'duk') 
 
 		self.inp_script_path = options.get('inp_script')
@@ -23,14 +23,9 @@ class FuzzClient(ABC):
 			if self.target_offset is None:
 				raise Exception('target_offset must be specified with target_module')
 
-		'''
-		we gonna write input file to this path
-		'''
-		self.inp_path = options.get('inp_path')
-		self.logger.debug('inp_path: %s' % self.inp_path)
-
 		self.inp_sync_module = options.get('inp_sync_module')
 		self.inp_sync_offset = options.get('inp_sync_offset')
+
 		if self.inp_sync_module and self.inp_sync_offset:
 			self.inp_sync = True
 		elif self.inp_sync_module and not self.inp_sync_offset:
@@ -40,5 +35,5 @@ class FuzzClient(ABC):
 		else:
 			self.inp_sync = False
 
-		
+
 

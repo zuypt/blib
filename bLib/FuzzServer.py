@@ -43,6 +43,7 @@ class FuzzServer(ABC):
 	
 		self.queue 			= []
 		self.queue_idx 		= 0
+		self.syn_count 		= 0
 		self.dryrun_idx 	= 0
 		self.hang_count 	= 0
 		self.crash_count 	= 0
@@ -187,6 +188,14 @@ class FuzzServer(ABC):
 		self.queue_idx += 1
 		return testcase
 
+	def add_sync_file_to_queue(self, fpath):
+		fname = 'syn_%06d' % self.syn_count
+		shutil.copyfile(fpath, join(self.queuedir, fname))
+		testcase = Testcase(self.queuedir, fname)
+		self.queue.append(testcase)
+		self.syn_count += 1
+		return testcase
+
 	def _do_sync(self, odir):
 		queuedir = join(odir, 'queue')
 		for fname in os.listdir(queuedir):
@@ -205,9 +214,9 @@ class FuzzServer(ABC):
 
 			handle crash, hang ?
 			'''
-			fault = self.executor.exec_one()
+			fault = self.executor.exec_one(INFINITE)
 			if self.bcov.has_new_cov():
-				testcase = self.add_file_to_queue(full_path)
+				testcase = self.add_sync_file_to_queue(full_path)
 				self.logger.info('sync ' + str(testcase))
 
 	def sync(self):
@@ -225,7 +234,10 @@ class FuzzServer(ABC):
 			self.syn_dict[odir] = {}
 
 		for odir in self.syn_dict:
-			self._do_sync(odir)
+			if exists(odir):
+				self._do_sync(odir)
+			else:
+				del self.syn_dict[odir]
 
 
 

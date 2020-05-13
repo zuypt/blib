@@ -11,16 +11,19 @@ from bLib.Executor import Executor
 from bLib.FuzzServer import FuzzServer
 from bLib.Cov import BreakPointCoverage
 
-args = ['mp32.exe', 'test.mp3']
+inp_path = sys.argv[1] + '.mp3'
+
+args = ['mp32.exe', inp_path]
 
 options = {
+	'id': sys.argv[1],
 	'idir': 'mp3',
 	'odir': 'out',
 	'target_module': 'mp32.exe',
 	'target_offset': 0x10a0,
 	'cov_modules': ['mp3dmod.dll'],
 	'bbs_files': ['mp3dmod.bbs'],
-	'inp_path': 'test.mp3'
+	'inp_path': inp_path
 }
 
 class Server(FuzzServer):
@@ -73,10 +76,18 @@ class Server(FuzzServer):
 					self.logger.info('new hang')
 					self.found_new_hang(buf)
 					self._dry_run()
+					'''
+					cung khong biet tai sao :)
+					'''
+					break
 				elif fault == FAULT_CRASH:
 					self.logger.info('new crash')
 					self.found_new_crash(buf)
 					self._dry_run()
+					'''
+					cung khong biet tai sao :)
+					'''
+					break
 
 				self.nexecs += 1
 				if (self.nexecs == 50):
@@ -87,6 +98,7 @@ class Server(FuzzServer):
 					self.starttime = self.endtime
 
 					print ('exec/s: ', 50 / interval)
+			self.sync()
 
 fuzzserver = Server(args, **options)
 fuzzserver.start()
