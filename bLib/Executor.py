@@ -90,6 +90,7 @@ class Executor():
 		if cmd == b'K':
 			return FAULT_NONE
 		elif cmd == b'C':
+			self.cleanup()
 			return FAULT_CRASH
 		elif cmd == b'\x00':
 			'''
@@ -98,8 +99,8 @@ class Executor():
 			Known bugs: client crashes when encounter a stack exhaustion bug.
 			'''
 			time.sleep(1) # wait for target process to terminate 
+			self.cleanup()
 			if psutil.pid_exists(self.pid):
-				self.kill()
 				self.logger.info('timeout')
 				return FAULT_TMOUT
 			else:
