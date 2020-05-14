@@ -165,15 +165,18 @@ function addBreakpoint(module, idx)
 	var old_protect = Memory.alloc(4)
 	var bbs = OPTIONS['bbs'][idx]
 
+	var bbs_start 	= parseInt(bbs['start'])
+	var bbs_end 	= parseInt(bbs['end'])
+	VirtualProtect(base.add(bbs_start), bbs_end - bbs_start + 1, PAGE_EXECUTE_READWRITE, old_protect)
+
 	for (var bb in bbs)
 	{
 		var bb_offset = parseInt(bb)
-		//debug(bb_offset.toString(16))
-		var target = base.add(bb_offset)
-		
-		VirtualProtect(target, 1, PAGE_EXECUTE_READWRITE, old_protect)
-		target.writeU8(0xcc)
-		VirtualProtect(target, 1, PAGE_EXECUTE_READ, old_protect)
+		if (bb_offset !== NaN)
+		{
+			var target = base.add(bb_offset)
+			target.writeU8(0xcc)
+		}
 	}
 	debug('addBreakpoint ' + 'done')
 }
@@ -187,9 +190,8 @@ function removeBreakpoint(addr, offset, idx)
 	{
 		var bb = bbs[key]
 		var old_protect = Memory.alloc(4)
-		VirtualProtect(addr, 1, PAGE_EXECUTE_READWRITE, old_protect)
+		
 		addr.writeU8(bb['byte'])
-		VirtualProtect(addr, 1, PAGE_EXECUTE_READ, old_protect)
 		
 		var t = BB_COUNT.readU32() + 1
 		BB_COUNT.writeU32(t)
