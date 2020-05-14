@@ -163,36 +163,38 @@ function addBreakpoint(module, idx)
 	var module_name = module.name
 
 	var old_protect = Memory.alloc(4)
-	var bbs = OPTIONS['bbs'][idx]
+	var bbs_info = OPTIONS['bbs_infos'][idx]
 
-	var bbs_start 	= parseInt(bbs['start'])
-	var bbs_end 	= parseInt(bbs['end'])
-	VirtualProtect(base.add(bbs_start), bbs_end - bbs_start + 1, PAGE_EXECUTE_READWRITE, old_protect)
+	var text_start 	= bbs_info['text_start']
+	var text_size 	= bbs_info['text_size']
 
-	for (var bb in bbs)
+	var r = VirtualProtect(base.add(text_start), text_size, PAGE_EXECUTE_READWRITE, old_protect)
+	if (r)
 	{
-		var bb_offset = parseInt(bb)
-		if (bb_offset !== NaN)
+		for (var bb in bbs_info['block_dict'])
 		{
+			var bb_offset = parseInt(bb)
 			var target = base.add(bb_offset)
 			target.writeU8(0xcc)
 		}
+		debug('addBreakpoint ' + 'done')
 	}
-	debug('addBreakpoint ' + 'done')
+	else 
+	{
+		debug('we should not be here')
+		ExitProcess(-1)
+	}
 }
 
 function removeBreakpoint(addr, offset, idx)
 {
 	var key = offset.toUInt32()
-	var bbs = OPTIONS['bbs'][idx]
+	var bbs_dict = OPTIONS['bbs_infos'][idx]['block_dict']
 
-	if (bbs.hasOwnProperty(key)) 
+	if (bbs_dict.hasOwnProperty(key)) 
 	{
-		var bb = bbs[key]
-		var old_protect = Memory.alloc(4)
-		
+		var bb = bbs_dict[key]
 		addr.writeU8(bb['byte'])
-		
 		var t = BB_COUNT.readU32() + 1
 		BB_COUNT.writeU32(t)
 

@@ -11,10 +11,16 @@ from java.awt import Color
 SBM = SimpleBlockModel(currentProgram)
 BlockIterator = SimpleBlockIterator(SBM, None)
 
-BBS = {}
+BLOCK_DICT = {}
 
 MEMORY = currentProgram.getMemory()
 SEGMENTS = MEMORY.getBlocks()
+
+def get_text_segment():
+	for seg in SEGMENTS:
+		if seg.getName() == '.text':
+			return (seg.getStart(), seg.getEnd(), seg.getSize())
+	raise Exception('cannot find .text segment')
 
 def get_file_offset(addr):
 	global SEGMENTS
@@ -35,7 +41,7 @@ while BlockIterator.hasNext():
 	# print (blk.minAddress)
 	# print (blk.maxAddress)
 	# print (blk.startAddresses)
-	BBS[addr2int(blk.minAddress)] = {
+	BLOCK_DICT[addr2int(blk.minAddress)] = {
 		'start': addr2int(blk.minAddress), 
 		'end': addr2int(blk.maxAddress),
 		'size': blk.maxAddress.subtract(blk.minAddress) + 1,
@@ -46,11 +52,19 @@ while BlockIterator.hasNext():
 fc = GhidraFileChooser(None)
 fp = fc.getSelectedFile()
 
-print ('num bb: ', len(BBS))
-
+print ('num bb: ', len(BLOCK_DICT))
 f = open(repr(fp), 'wb')
-f.write(pickle.dumps(BBS, protocol=2))
+
+start, end, size = get_text_segment()
+print start, end, size
+
+
+BLOCK_INFO = {
+	'text_start': addr2int(start),
+	'text_end': addr2int(end),
+	'text_size': size,
+	'block_dict': BLOCK_DICT
+}
+
+f.write(pickle.dumps(BLOCK_INFO, protocol=2))
 f.close()
-
-
-	

@@ -171,21 +171,16 @@ class BreakPointCoverage():
 			options = {
 				'shm_name': self.shm_name, # store bb_count
 				'cov_modules': self.cov_modules,
-				'bbs': self.bbs
+				'bbs_infos': self.bbs_infos
 			}
 			self.script.exports.init(options)
 
 	def _load_bbs_files(self, bbs_files):
-		self.bbs = []
+		self.bbs_infos = []
 		for bbs_file in bbs_files:
 			with open(bbs_file, 'rb') as f:
 				bbs_dict 	= pickle.loads(f.read())
-				sorted_key 	= sorted(bbs_dict)
-				
-				bbs_dict['start'] 	= sorted_key[0]
-				bbs_dict['end'] 	= sorted_key[-1]
-
-				self.bbs.append(bbs_dict)
+				self.bbs_infos.append(bbs_dict)
 
 	def get_bb_count(self):
 		self.bb_count = u32_pointer(self.shm)[0] 
