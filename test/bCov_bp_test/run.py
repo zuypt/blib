@@ -13,7 +13,7 @@ from bLib.Cov import BreakPointCoverage
 
 inp_path = sys.argv[1] + '.mp3'
 
-args = ['mp32.exe', inp_path]
+args = ['mp32_p.exe', inp_path]
 
 options = {
 	'id': sys.argv[1],

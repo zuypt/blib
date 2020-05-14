@@ -32,11 +32,20 @@ var WriteCommandToPipe = null
 var MessageBox = null
 
 var ExitProcess = null;
-
+var EXCEPTION_WHITELIST = null
 rpc.exports = {
 	init: function(options)
 	{
 		ExitProcess = new NativeFunction(Module.getExportByName(null, 'ExitProcess'), 'void', ['uint16'])
+		
+		EXCEPTION_WHITELIST = {
+			'abort': 1,
+			'access-violation': 1,
+			'guard-page': 1,
+			'illegal-instruction': 1,
+			'stack-overflow': 1 
+		}
+
 
 		OPTIONS = options
 		//debug(stringify(OPTIONS))
@@ -171,14 +180,6 @@ function post_fuzz_handler()
 {
 	//debug('post_fuzz_handler>')
 	WriteCommandToPipe(ord('K'));
-}
-
-EXCEPTION_WHITELIST = {
-	'abort': 1,
-	'access-violation': 1,
-	'guard-page': 1,
-	'illegal-instruction': 1,
-	'stack-overflow': 1 
 }
 
 function setup_crash_handler()
