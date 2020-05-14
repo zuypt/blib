@@ -179,7 +179,13 @@ class BreakPointCoverage():
 		self.bbs = []
 		for bbs_file in bbs_files:
 			with open(bbs_file, 'rb') as f:
-				self.bbs.append(pickle.loads(f.read()))
+				bbs_dict 	= pickle.loads(f.read())
+				sorted_key 	= sorted(bbs_dict)
+				
+				bbs_dict['start'] 	= sorted_key[0]
+				bbs_dict['end'] 	= sorted_key[-1]
+
+				self.bbs.append(bbs_dict)
 
 	def get_bb_count(self):
 		self.bb_count = u32_pointer(self.shm)[0] 
