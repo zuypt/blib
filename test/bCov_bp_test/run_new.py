@@ -22,8 +22,8 @@ options = {
 	'odir': 'out',
 	'target_module': 'mp32.exe',
 	'target_offset': 0x10a0,
-	'cov_modules': ['mp3dmod.dll', 'MSAudDecMFT.dll', 'mfreadwrite.dll'],
-	'module_info_files': ['mp3dmod.bbs', 'msauddecmft.bbs', 'mfreadwrite.bbs'],
+	'cov_modules': ['mp3dmod.dll', 'MSAudDecMFT.dll'],#, 'mfreadwrite.dll'],
+	'module_info_files': ['mp3dmod.bbs', 'msauddecmft.bbs'],#, 'mfreadwrite.bbs'],
 	'inp_path': inp_path
 }
 

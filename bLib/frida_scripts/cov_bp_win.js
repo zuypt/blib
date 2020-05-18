@@ -255,7 +255,7 @@ function setup_breakpoint_handler()
 				
 				var offset = addr.sub(module.base)
 				var module_name = module.name
-
+				var cov_modules = OPTIONS['cov_modules']
 				//debug(module_name)
 
 				for (var i = 0; i < cov_modules.length; i++)
