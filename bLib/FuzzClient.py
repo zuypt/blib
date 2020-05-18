@@ -58,7 +58,6 @@ class FridaClient(ABC):
 		module_info_files = options.get('module_info_files')
 		if module_info_files is None:
 			raise Exception('missing module_info_files')
-		self._load_module_infos(module_info_files)
 
 		'''
 		This is used to wait for FuzzServer to write inp file in case of
