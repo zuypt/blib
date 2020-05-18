@@ -99,11 +99,12 @@ class Executor():
 			Known bugs: client crashes when encounter a stack exhaustion bug.
 			'''
 			time.sleep(1) # wait for target process to terminate 
-			self.cleanup()
 			if psutil.pid_exists(self.pid):
 				self.logger.info('timeout')
+				self.cleanup()
 				return FAULT_TMOUT
 			else:
+				self.cleanup()
 				self.logger.error('client is dead')
 				return FAULT_ERROR
 		else:
