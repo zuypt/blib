@@ -137,7 +137,7 @@ class FuzzServer(ABC):
 			f.write(pickle.dumps(fuzzer_state))
 
 		with open(join(self.odir, 'cov.pkl'), 'wb') as f:
-			f.write(pickle.dumps(self.bcov.get_cov(), protocol=2))
+			f.write(pickle.dumps(self.client.get_cov(), protocol=2))
 
 	def _load_state(self):
 		with open(join(self.odir, 'cov.pkl'), 'rb') as f:
@@ -232,7 +232,7 @@ class FuzzServer(ABC):
 			handle crash, hang ?
 			'''
 			fault = self.client.exec_one(INFINITE)
-			if self.bcov.has_new_cov():
+			if self.client.has_new_cov():
 				testcase = self.add_sync_file_to_queue(full_path)
 				self.logger.info('sync ' + str(testcase))
 
