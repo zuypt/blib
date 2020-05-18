@@ -142,7 +142,7 @@ class FuzzServer(ABC):
 	def _load_state(self):
 		with open(join(self.odir, 'cov.pkl'), 'rb') as f:
 			cov_dict = pickle.loads(f.read())
-		self.executor.load_cov(cov_dict)
+		self.client.load_cov(cov_dict)
 		with open(join(self.odir, 'state.pkl'), 'rb') as f:
 			fuzzer_state = pickle.loads(f.read())
 
@@ -231,7 +231,7 @@ class FuzzServer(ABC):
 
 			handle crash, hang ?
 			'''
-			fault = self.executor.exec_one(INFINITE)
+			fault = self.client.exec_one(INFINITE)
 			if self.bcov.has_new_cov():
 				testcase = self.add_sync_file_to_queue(full_path)
 				self.logger.info('sync ' + str(testcase))
