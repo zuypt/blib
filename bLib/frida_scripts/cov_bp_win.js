@@ -84,7 +84,7 @@ rpc.exports = {
 					var cov_module = cov_modules[i]
 					if (endsWithi(cov_module, module_name))
 					{
-						addBreakpoint(module)
+						addBreakpoint(module, i)
 					}
 				}
 			},
@@ -160,7 +160,7 @@ const PAGE_READWRITE = 4
 function addBreakpoint(module, idx) 
 {
 	debug('addBreakpoint ' + module.name)
-
+	
 	var base = module.base
 	var module_name = module.name
 
@@ -244,7 +244,7 @@ function setup_breakpoint_handler()
 		{		
 			if (details.type == 'breakpoint')
 			{
-				//debug('breakpoint handler')
+				// debug('breakpoint handler')
 				var addr = details.address		
 				var module = Process.getModuleByAddress(addr)
 				if (!module)
@@ -257,7 +257,6 @@ function setup_breakpoint_handler()
 				var module_name = module.name
 
 				//debug(module_name)
-				var cov_modules = OPTIONS['cov_modules']
 
 				for (var i = 0; i < cov_modules.length; i++)
 				{
