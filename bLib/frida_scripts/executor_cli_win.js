@@ -46,7 +46,6 @@ rpc.exports = {
 			'stack-overflow': 1 
 		}
 
-
 		OPTIONS = options
 		//debug(stringify(OPTIONS))
 		if (Process.arch == 'x64') Module.load(OPTIONS['libpath64'] + '\\winafl_util_cli.dll')
@@ -95,15 +94,24 @@ function LoadLibEvent_setup() {
 		{
 			if (retval)
 			{
-				var module = Process.getModuleByAddress(retval)
-				if (module)
+				try
 				{
-					LoadLibEvent(module)
+					var module = Process.getModuleByAddress(retval)
+					if (module)
+					{
+						LoadLibEvent(module)
+					}
 				}
-				else
+				catch (err)
 				{
-					debug('we should not be here')
-				}	
+					// known bug, weird retval value
+					/*
+					ERROR:FuzzClient:
+					{'type': 'error', 'description': 'Error: unable to find module containing 0x1e994bf0001', 'stack': 'Error: unable to find module containing 0x1e994bf0001\n    at frida/runtime/core.js:337\n    at /script1.js:97', 'fileName': 'frida/runtime/core.js', 'lineNumber': 337, 'columnNumber': 1}
+					*/
+					;
+				}
+
 			}
 		}
 	});
@@ -122,6 +130,7 @@ function LoadLibEvent(module)
 
 		if (OPTIONS.hasOwnProperty('inp_sync_module'))
 		{
+			if (OPTIONS['inp_sync_module'] == null) return;
 			var inp_sync_module = OPTIONS['inp_sync_module'].toLowerCase()
 			if (module_name.endsWith(inp_sync_module))
 			{
@@ -166,12 +175,12 @@ function pre_fuzz_handler()
 	{
 		if (cmd == ord('Q'))
 		{
-			ExitProcess(0)
+			ExitProcess(-1)
 		}
 		else
 		{
 			debug('invalid cmd: ' + cmd)
-			ExitProcess(0)
+			ExitProcess(-1)
 		}
 	}
 }
@@ -190,8 +199,10 @@ function setup_crash_handler()
 		{			
 			if (EXCEPTION_WHITELIST.hasOwnProperty(details.type))
 			{
+				debug(stringify(details))
 				WriteCommandToPipe(ord('C'));
-				return false;
+				
+				//ExitProcess(0)
 			}
 		}
 	);

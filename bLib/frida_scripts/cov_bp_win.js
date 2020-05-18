@@ -61,15 +61,16 @@ var GetLastError = new NativeFunction(Module.getExportByName(null, 'GetLastError
 var COV_MODULE_STARTS = []
 var COV_MODULE_ENDS   = []
 
-var BB_COUNT = null
+var MAP = null
+var HITCOUNT = null
 
 rpc.exports = {
 	init: function(options)
 	{
 		OPTIONS = options
 
-		BB_COUNT = new NativePointer(setup_shm_win(OPTIONS['shm_name'], 4))
-		BB_COUNT.writeU32(0)
+		MAP = new NativePointer(setup_shm_win(OPTIONS['shm_name'] + '_MAP', OPTIONS['shm_size']))
+		HITCOUNT = new NativePointer(setup_shm_win(OPTIONS['shm_name'] + '_HITCOUNT', 4))
 
 		Process.enumerateModulesSync(
 		{
@@ -99,6 +100,7 @@ rpc.exports = {
 			onLeave: function(){}
 		})
 		loadLibraryHook();
+		setup_breakpoint_handler()
 	}
 }
 
@@ -163,17 +165,27 @@ function addBreakpoint(module, idx)
 	var module_name = module.name
 
 	var old_protect = Memory.alloc(4)
-	var bbs_info = OPTIONS['bbs_infos'][idx]
+	var module_info = OPTIONS['module_infos'][idx]
 
-	var text_start 	= bbs_info['text_start']
-	var text_size 	= bbs_info['text_size']
+	var text_start 	= module_info['text_start']
+	var text_size 	= module_info['text_size']
+	var block_dict  = module_info['block_dict'] 
 
 	var r = VirtualProtect(base.add(text_start), text_size, PAGE_EXECUTE_READWRITE, old_protect)
 	if (r)
 	{
-		for (var bb in bbs_info['block_dict'])
+		for (var k in block_dict)
 		{
-			var bb_offset = parseInt(bb)
+			var block_info = block_dict[k]
+			var block_id = block_info['id']
+
+			if (MAP.add(block_id).readU8()) 
+			{
+				//debug('skip seen block');
+				continue
+			}
+
+			var bb_offset = block_info['start']
 			var target = base.add(bb_offset)
 			target.writeU8(0xcc)
 		}
@@ -188,15 +200,23 @@ function addBreakpoint(module, idx)
 
 function removeBreakpoint(addr, offset, idx)
 {
+	
 	var key = offset.toUInt32()
-	var bbs_dict = OPTIONS['bbs_infos'][idx]['block_dict']
+	var block_dict = OPTIONS['module_infos'][idx]['block_dict']
 
-	if (bbs_dict.hasOwnProperty(key)) 
+	if (block_dict.hasOwnProperty(key)) 
 	{
-		var bb = bbs_dict[key]
+
+		var bb = block_dict[key]
+
+		// write the original byte back
 		addr.writeU8(bb['byte'])
-		var t = BB_COUNT.readU32() + 1
-		BB_COUNT.writeU32(t)
+	
+		// increase hitcount by 1
+		HITCOUNT.writeU32(HITCOUNT.readU32()+1)
+
+		// mark this block in map
+		MAP.add(bb['id']).writeU8(1)
 
 		return true;
 	}
@@ -217,35 +237,38 @@ function loadLibraryEvent(module) {
 	}
 }
 
-Process.setExceptionHandler(
-	function (details)
-	{		
-		if (details.type == 'breakpoint')
-		{
-			//debug('breakpoint handler')
-			var addr = details.address		
-			var module = Process.getModuleByAddress(addr)
-			if (!module)
+function setup_breakpoint_handler()
+{
+	Process.setExceptionHandler(
+		function (details)
+		{		
+			if (details.type == 'breakpoint')
 			{
-				debug('ignore breakpoint')
+				//debug('breakpoint handler')
+				var addr = details.address		
+				var module = Process.getModuleByAddress(addr)
+				if (!module)
+				{
+					debug('ignore breakpoint')
+					return false;
+				}
+				
+				var offset = addr.sub(module.base)
+				var module_name = module.name
+
+				//debug(module_name)
+				var cov_modules = OPTIONS['cov_modules']
+
+				for (var i = 0; i < cov_modules.length; i++)
+				{
+					var cov_module = cov_modules[i]
+					if (endsWithi(module_name, cov_module))
+					{
+						return removeBreakpoint(addr, offset, i)
+					}
+				}
 				return false;
 			}
-			
-			var offset = addr.sub(module.base)
-			var module_name = module.name
-
-			//debug(module_name)
-			var cov_modules = OPTIONS['cov_modules']
-
-			for (var i = 0; i < cov_modules.length; i++)
-			{
-				var cov_module = cov_modules[i]
-				if (endsWithi(module_name, cov_module))
-				{
-					return removeBreakpoint(addr, offset, i)
-				}
-			}
-			return false;
 		}
-	}
-);
+	);
+}

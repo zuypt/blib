@@ -39,6 +39,8 @@ class FuzzServer(ABC):
 		self.options 	= options
 		self.id 		= options.get('id', 'Fuzzer1')
 
+		self.client 	= None
+
 		signal(SIGINT, self.ctrlc)
 	
 		self.queue 			= []
@@ -177,9 +179,24 @@ class FuzzServer(ABC):
 		if self.resume:
 			self._load_state()
 
-		self._dry_run()
-		self._fuzz_loop()
+		if self.client is None:
+			raise Exception('Subclass must init self.client')
+		
+		'''
+		give client a chance to initialize before fuzzing
+		start a persistence process for example
+		'''
+		try:
+			self.client.init()
+			if self._dry_run() != FUZZER_STOP:
+				self._fuzz_loop()
+		except:
+			traceback.print_exc()
+			self.client.kill()
 
+		self.client.cleanup()
+		self.logger.info('fuzzer exit')
+		
 	def add_file_to_queue(self, fpath):
 		fname = 'orig,id_%06d,%s' % (self.queue_idx, os.path.basename(fpath))
 		shutil.copyfile(fpath, join(self.queuedir, fname))
@@ -238,10 +255,3 @@ class FuzzServer(ABC):
 				self._do_sync(odir)
 			else:
 				del self.syn_dict[odir]
-
-
-
-				
-
-
-
