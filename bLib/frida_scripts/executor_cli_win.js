@@ -200,6 +200,17 @@ function setup_crash_handler()
 			if (EXCEPTION_WHITELIST.hasOwnProperty(details.type))
 			{
 				debug(stringify(details))
+
+
+				var addr = details.address		
+				var module = Process.getModuleByAddress(addr)
+
+				debug(module.name)
+
+				var offset = addr.sub(module.base)
+				debug(offset)
+
+
 				WriteCommandToPipe(ord('C'));
 				
 				//ExitProcess(0)

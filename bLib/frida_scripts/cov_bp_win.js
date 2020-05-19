@@ -189,6 +189,7 @@ function addBreakpoint(module, idx)
 			var target = base.add(bb_offset)
 			target.writeU8(0xcc)
 		}
+		VirtualProtect(base.add(text_start), text_size, PAGE_EXECUTE_READ, old_protect)
 		debug('addBreakpoint ' + 'done')
 	}
 	else 
@@ -210,7 +211,11 @@ function removeBreakpoint(addr, offset, idx)
 		var bb = block_dict[key]
 
 		// write the original byte back
+		// error checking ???
+		var old_protect = Memory.alloc(4)
+		VirtualProtect(addr, 1, PAGE_EXECUTE_READWRITE, old_protect)
 		addr.writeU8(bb['byte'])
+		VirtualProtect(addr, 1, PAGE_EXECUTE_READ, old_protect)
 	
 		// increase hitcount by 1
 		HITCOUNT.writeU32(HITCOUNT.readU32()+1)
