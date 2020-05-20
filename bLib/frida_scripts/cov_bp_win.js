@@ -205,7 +205,7 @@ function removeBreakpoint(addr, offset, idx)
 	
 	var key = offset.toUInt32()
 
-	debug(offset)
+	//debug(offset)
 
 	var block_dict = OPTIONS['module_infos'][idx]['block_dict']
 
