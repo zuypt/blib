@@ -187,10 +187,13 @@ class Mutator():
 		func_to_choose = [havoc_bitflip, havoc_interesting_byte, havoc_interesting_2bytes, havoc_interesting_4bytes,
 						  havoc_randomly_add, havoc_randomly_substract, havoc_randomly_add_2bytes,
 						  havoc_randomly_substract_2bytes, havoc_randomly_add_4bytes, havoc_randomly_substract_4bytes,
-						  havoc_set_randomly, havoc_remove_randomly_block, havoc_remove_randomly_block, havoc_clone_randomly_block,
+						  havoc_set_randomly, havoc_remove_randomly_block, havoc_clone_randomly_block,
 						  havoc_overwrite_randomly_block]
 
-		use_stacking = 1 << 1 + RAND(AFL_HAVOC_STACK_POW2)
+		# use_stacking = 1 << 1 + RAND(AFL_HAVOC_STACK_POW2)
+		# allow use_stacking == 1, good for small input
+		use_stacking = 1 << RAND(AFL_HAVOC_STACK_POW2)
+
 		for i in range (0, use_stacking):
 			method = RAND(len(func_to_choose))
 			# randomly select one of the available methods
