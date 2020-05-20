@@ -22,8 +22,8 @@ options = {
 	'odir': 'out',
 	'target_module': 'mp32.exe',
 	'target_offset': 0x10a0,
-	'cov_modules': ['mp3dmod.dll', 'MSAudDecMFT.dll'],#, 'mfreadwrite.dll'],
-	'module_info_files': ['mp3dmod.bbs', 'msauddecmft.bbs'],#, 'mfreadwrite.bbs'],
+	'cov_modules': ['mp3dmod.dll', 'MSAudDecMFT.dll', 'mfreadwrite.dll'],
+	'module_info_files': ['mp3dmod.bbs', 'msauddecmft.bbs', 'mfreadwrite.bbs'],
 	'inp_path': inp_path
 }
 
@@ -88,7 +88,7 @@ class Server(FuzzServer):
 				buf = self.mutator.havoc(t, 0, 1024)[0]
 				self.prepare_inp(buf)
 
-				fault = self.client.exec_one(4000)
+				fault = self.client.exec_one(20000)
 
 				if fault == FAULT_NONE:
 					if self.client.has_new_cov():

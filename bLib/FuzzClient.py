@@ -270,11 +270,17 @@ class BreakpointClient(FridaClient):
 
 		start_id = 0
 		self.module_infos = []
-		for module_info_file in module_info_files:
+		for i, module_info_file in enumerate(module_info_files):
 			with open(module_info_file, 'rb') as f:
 				module_info = pickle.loads(f.read())
 
 				block_dict = module_info['block_dict']
+				'''
+				remove the breakpoint at target_offset
+				'''
+				if self.cov_modules[i] == self.target_module:
+					del block_dict[self.target_offset]
+
 				self.bb_count += len(block_dict)
 
 				'''

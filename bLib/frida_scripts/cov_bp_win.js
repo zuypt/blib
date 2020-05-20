@@ -201,8 +201,12 @@ function addBreakpoint(module, idx)
 
 function removeBreakpoint(addr, offset, idx)
 {
+	//debug('removeBreakpoint: ')
 	
 	var key = offset.toUInt32()
+
+	debug(offset)
+
 	var block_dict = OPTIONS['module_infos'][idx]['block_dict']
 
 	if (block_dict.hasOwnProperty(key)) 
@@ -216,13 +220,16 @@ function removeBreakpoint(addr, offset, idx)
 		VirtualProtect(addr, 1, PAGE_EXECUTE_READWRITE, old_protect)
 		addr.writeU8(bb['byte'])
 		VirtualProtect(addr, 1, PAGE_EXECUTE_READ, old_protect)
-	
+		
+		//debug(Instruction.parse(addr).toString())
+		//debug(hexdump(addr, {'length': 4}))
+
+
 		// increase hitcount by 1
 		HITCOUNT.writeU32(HITCOUNT.readU32()+1)
 
 		// mark this block in map
 		MAP.add(bb['id']).writeU8(1)
-
 		return true;
 	}
 	return false;
