@@ -78,15 +78,15 @@ class Executor():
 
 	def __exec_one(self, tmout):
 		cmd = ReadCommandFromPipe(INFINITE)
-		# self.logger.debug('recieved from pipe: ' + repr(r))
+		# self.logger.debug('received from pipe: ' + repr(r))
 		if cmd != b'P':
-			self.logger.error('unexpected cmd, expetected P, recieved: ' + repr(cmd))
+			self.logger.error('unexpected cmd, expected P, received: ' + repr(cmd))
 			self.kill()
 			return FAULT_ERROR
 		WriteCommandToPipe(b'F')
 
 		cmd = ReadCommandFromPipe(tmout)
-		# self.logger.debug('recieved from pipe: ' + repr(r))
+		# self.logger.debug('received from pipe: ' + repr(r))
 		if cmd == b'K':
 			return FAULT_NONE
 		elif cmd == b'C':
@@ -108,7 +108,7 @@ class Executor():
 				self.logger.error('client is dead')
 				return FAULT_ERROR
 		else:
-			self.logger.error('unexpected cmd, recieved: ' + repr(cmd))
+			self.logger.error('unexpected cmd, received: ' + repr(cmd))
 			return FAULT_ERROR
 
 	def kill(self):
