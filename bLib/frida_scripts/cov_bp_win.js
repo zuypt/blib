@@ -76,6 +76,11 @@ rpc.exports = {
 		{
 			onMatch: function(module)
 			{
+				LOADED_MODULES[module.name] = module
+
+				// debug(module.name)
+				// debug(module.base)
+
 				var cov_modules = OPTIONS['cov_modules']
 
 				for (var i=0; i<cov_modules.length; i++)
@@ -135,6 +140,8 @@ function loadLibraryHook() {
 					else
 					{
 						LOADED_MODULES[module.name] = module
+						// debug(module.name)
+						// debug(module.base)
 						loadLibraryEvent(module)
 					}
 				}
@@ -159,6 +166,7 @@ const PAGE_EXECUTE_READ = 0x20
 const PAGE_READWRITE = 4
 function addBreakpoint(module, idx) 
 {
+	var t1 = performance.now()
 	debug('addBreakpoint ' + module.name)
 	
 	var base = module.base
@@ -197,6 +205,7 @@ function addBreakpoint(module, idx)
 		debug('we should not be here')
 		ExitProcess(-1)
 	}
+	debug((performance.now() - t1)/1000)
 }
 
 function removeBreakpoint(addr, offset, idx)

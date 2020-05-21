@@ -192,6 +192,7 @@ class Mutator():
 
 		# use_stacking = 1 << 1 + RAND(AFL_HAVOC_STACK_POW2)
 		# allow use_stacking == 1, good for small input
+		# crash testbin in 30 mins
 		use_stacking = 1 << RAND(AFL_HAVOC_STACK_POW2)
 
 		for i in range (0, use_stacking):
