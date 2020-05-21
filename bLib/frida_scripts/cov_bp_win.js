@@ -166,8 +166,8 @@ const PAGE_EXECUTE_READ = 0x20
 const PAGE_READWRITE = 4
 function addBreakpoint(module, idx) 
 {
-	var t1 = performance.now()
-	debug('addBreakpoint ' + module.name)
+	//var t1 = performance.now()
+	//debug('addBreakpoint ' + module.name)
 	
 	var base = module.base
 	var module_name = module.name
@@ -177,14 +177,14 @@ function addBreakpoint(module, idx)
 
 	var text_start 	= module_info['text_start']
 	var text_size 	= module_info['text_size']
-	var block_dict  = module_info['block_dict'] 
+	var block_array  = module_info['block_array'] 
 
 	var r = VirtualProtect(base.add(text_start), text_size, PAGE_EXECUTE_READWRITE, old_protect)
 	if (r)
 	{
-		for (var k in block_dict)
+		for (var i = 0; i < block_array.length; i++)
 		{
-			var block_info = block_dict[k]
+			var block_info = block_array[i]
 			var block_id = block_info['id']
 
 			if (MAP.add(block_id).readU8()) 
@@ -205,7 +205,7 @@ function addBreakpoint(module, idx)
 		debug('we should not be here')
 		ExitProcess(-1)
 	}
-	debug((performance.now() - t1)/1000)
+	//debug((performance.now() - t1)/1000)
 }
 
 function removeBreakpoint(addr, offset, idx)

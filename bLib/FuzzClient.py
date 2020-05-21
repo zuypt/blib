@@ -263,6 +263,7 @@ class BreakpointClient(FridaClient):
 		script_path = join(FRIDA_SCRIPTDIR, 'cov_bp_win.js')
 
 	def _load_module_infos(self, module_info_files):
+		# t1 = time.monotonic()
 		'''
 		the total number of basic block
 		'''
@@ -290,11 +291,19 @@ class BreakpointClient(FridaClient):
 					block_dict[k]['id'] = start_id
 					start_id += 1
 
+				''' 
+				convert dictionary to list 
+				optimize performance for javascript side
+				'''
+				module_info['block_array'] = list(block_dict.values())
+
 				self.module_infos.append(module_info)
 
 		self.shm_name = '%s' % self.id
 		self.shm = create_shm(self.shm_name + '_MAP', self.bb_count)
 		self.hitcount = create_shm(self.shm_name + '_HITCOUNT', 4)
+
+		# self.logger.debug('_load_module_infos take: %fs' % (time.monotonic()-t1))
 
 	def init(self):
 		self.start_persistence_process()
