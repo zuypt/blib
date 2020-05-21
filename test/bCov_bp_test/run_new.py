@@ -57,7 +57,7 @@ class Server(FuzzServer):
 			self.prepare_inp(testcase.read())
 
 			fault = self.client.exec_one(INFINITE)
-			if fault == FAULT_CRASH:
+			if fault == FAULT_CRASH or fault == FAULT_ERROR:
 				self.logger.info('testcase cause crash')
 				return FUZZER_STOP
 			elif fault == FAULT_TMOUT:
