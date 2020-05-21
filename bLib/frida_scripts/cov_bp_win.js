@@ -72,6 +72,9 @@ rpc.exports = {
 		MAP = new NativePointer(setup_shm_win(OPTIONS['shm_name'] + '_MAP', OPTIONS['shm_size']))
 		HITCOUNT = new NativePointer(setup_shm_win(OPTIONS['shm_name'] + '_HITCOUNT', 4))
 
+		loadLibraryHook();
+		setup_breakpoint_handler()
+
 		Process.enumerateModulesSync(
 		{
 			onMatch: function(module)
@@ -104,8 +107,6 @@ rpc.exports = {
 			},
 			onLeave: function(){}
 		})
-		loadLibraryHook();
-		setup_breakpoint_handler()
 	}
 }
 
@@ -210,10 +211,9 @@ function addBreakpoint(module, idx)
 
 function removeBreakpoint(addr, offset, idx)
 {
-	//debug('removeBreakpoint: ')
-	
 	var key = offset.toUInt32()
-
+	
+	//debug('removeBreakpoint: ')
 	//debug(offset)
 
 	var block_dict = OPTIONS['module_infos'][idx]['block_dict']
@@ -265,7 +265,7 @@ function setup_breakpoint_handler()
 		{		
 			if (details.type == 'breakpoint')
 			{
-				// debug('breakpoint handler')
+				//debug('breakpoint handler')
 				var addr = details.address		
 				var module = Process.getModuleByAddress(addr)
 				if (!module)
