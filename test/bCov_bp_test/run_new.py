@@ -81,7 +81,7 @@ class Server(FuzzServer):
 			self.logger.info('new hang')
 			self.found_new_hang(buf)
 
-		elif fault == FAULT_CRASH:
+		elif fault == FAULT_CRASH or fault == FAULT_ERROR:
 			self.logger.info('new crash')
 			self.found_new_crash(buf)
 
