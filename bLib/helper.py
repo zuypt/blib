@@ -42,6 +42,19 @@ interesting_32_Bit = [4294967295, 2248146693, 2147516417, 32768, 65535, 65536, 1
 
 random.seed(os.urandom(4))
 
+def locate_diffs(data1, data2):
+	f_loc = -1
+	l_loc = -1
+
+	length = MIN(len(data1), len(data2))
+	
+	for i in range(0, length):
+		if data1[i] != data2[i]:
+			if f_loc == -1:
+				f_loc = i
+			l_loc = i
+	return f_loc, l_loc
+
 
 def AFL_choose_block_len(limit):
 	# Caps on block sizes for cloning and deletion operations. Each of these

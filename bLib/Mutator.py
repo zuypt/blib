@@ -1,6 +1,9 @@
+import random
 import logging
+
 from bLib.util import *
 from bLib.const import *
+
 from bLib import radamsa
 
 class Mutator():
@@ -74,7 +77,7 @@ class Mutator():
 				'''
 				fault = self.executor.exec_one(buf, 10*1000)
 				
-				cksum = self.executor.bcov.hash32()
+				cksum = self.client.hash32()
 				self.logger.debug('cksum: %x' % cksum)
 				if cksum == testcase.exec_cksum:
 					self.logger.debug('commit change')
@@ -112,7 +115,7 @@ class Mutator():
 		if fault != FAULT_NONE:
 			return fault
 
-		ctypes.memmove(first_trace, self.executor.bcov.trace_bits, self.map_sz)
+		ctypes.memmove(first_trace, self.client.trace_bits, self.map_sz)
 
 
 		len_p2 = next_pow2(testcase.len)
@@ -156,7 +159,7 @@ class Mutator():
 				if fault != FAULT_NONE:
 					return fault
 
-				r = self.executor.bcov.cmp_bitmap_ignore_loop(first_trace, self.executor.bcov.trace_bits)
+				r = self.client.cmp_bitmap_ignore_loop(first_trace, self.client.trace_bits)
 				if r == 0:
 					# self.logger.debug('commit change')
 					''' write the change back into testcase '''
@@ -176,14 +179,7 @@ class Mutator():
 
 		return FAULT_NONE
 
-	def havoc(self, data, func_state, max_havoc_cycles):
-		if not func_state:
-			func_state = 0
-
-		if func_state >= max_havoc_cycles:
-			return data, None
-
-		# havoc_randomly used twice to increase chances
+	def havoc(self, data):
 		func_to_choose = [havoc_bitflip, havoc_interesting_byte, havoc_interesting_2bytes, havoc_interesting_4bytes,
 						  havoc_randomly_add, havoc_randomly_substract, havoc_randomly_add_2bytes,
 						  havoc_randomly_substract_2bytes, havoc_randomly_add_4bytes, havoc_randomly_substract_4bytes,
@@ -199,6 +195,34 @@ class Mutator():
 			method = RAND(len(func_to_choose))
 			# randomly select one of the available methods
 			data = func_to_choose[method](data)
-		func_state += 1
 
-		return data, func_state
+		return data
+
+	def splice(self, data, list_of_files):
+		data_len = len(data)
+		if data_len <= 2:
+			return data
+
+		testcase = random.choice(list_of_files)
+		
+
+		content_target = testcase.read()
+
+		# self.logger.debug(b'1\n' + data)
+		# self.logger.debug(b'2\n' + content_target)
+
+		f_diff, l_diff = locate_diffs(data, content_target)
+
+		# afl has f_diff == 0 but I believe we want to start with 0
+		if l_diff < 2 or f_diff == l_diff: 
+			return data
+
+		split_last_byte = f_diff + RAND(l_diff - f_diff)
+		block = data[f_diff:f_diff+split_last_byte]
+		content_target = content_target[:f_diff] + block + content_target[f_diff+split_last_byte:]
+		data = content_target
+
+		# self.logger.debug(b'2\n' + data[:32])
+
+		data = self.havoc(data)
+		return data

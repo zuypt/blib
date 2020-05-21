@@ -167,7 +167,7 @@ const PAGE_READWRITE = 4
 function addBreakpoint(module, idx) 
 {
 	//var t1 = performance.now()
-	//debug('addBreakpoint ' + module.name)
+	debug('addBreakpoint ' + module.name)
 	
 	var base = module.base
 	var module_name = module.name

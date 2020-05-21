@@ -134,6 +134,7 @@ class FridaClient(ABC):
 				client crashed but not sending 'C'
 				'''
 				self.logger.error('client is dead')
+				self.restart_persistence_process()
 				return FAULT_ERROR
 		else:
 			self.restart_persistence_process()
