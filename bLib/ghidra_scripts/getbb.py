@@ -35,8 +35,30 @@ def get_file_offset(addr):
 def addr2int(addr):
 	return int(addr.toString(), 16)
 
+
+BLACK_LIST = {
+	'DllMain': 1,
+	'entry': 1,
+	'__dllonexit': 1,
+	'__GSHandlerCheck':1
+	'_CRT_INIT': 1,
+	'_invalid_parameter': 1,
+	'_invoke_watson': 1,
+	'_lock':1
+}
 while BlockIterator.hasNext():
 	blk = BlockIterator.next()
+
+	func = getFunctionContaining(blk.minAddress)
+
+	if func:
+		func_name = func.getName()
+		if func_name in BLACK_LIST:
+			# print func_name
+			continue
+	else:
+		print blk.minAddress
+
 	# print (dir(blk))
 	# print (blk.minAddress)
 	# print (blk.maxAddress)

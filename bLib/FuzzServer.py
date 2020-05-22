@@ -14,8 +14,9 @@ import traceback
 from time import sleep
 from signal import signal, SIGINT
 
-from bLib.const import *
+from datetime import timedelta
 
+from bLib.const import *
 from bLib.Mutator import Mutator
 from bLib.Testcase import Testcase
 from bLib.Executor import Executor
@@ -50,6 +51,9 @@ class FuzzServer(ABC):
 		self.hang_count 	= 0
 		self.crash_count 	= 0
 		
+		self.last_new_crash = None
+		self.last_new_hang = None
+
 		self.new_interesting_inp_count = 0
 		self.nexecs = 0
 
@@ -114,12 +118,21 @@ class FuzzServer(ABC):
 		f.write(buf)
 		f.close()
 		self.crash_count += 1
+		self.last_new_crash = time.time()
 
 	def found_new_hang(self, buf):
 		f = open(join(self.hangdir, 'hang_%d' % self.hang_count), 'wb')
 		f.write(buf)
 		f.close()
 		self.hang_count += 1
+		self.last_new_hang = time.time()
+		
+	def print_info(self):
+		if self.last_new_hang:
+			self.logger.info('last new hang: {}'.format(time.ctime(self.last_new_hang)))
+		if self.last_new_crash:
+			self.logger.info('last new crash: {}'.format(time.ctime(self.last_new_crash)))
+		self.logger.info('crash count: {}'.format(self.crash_count))
 
 	def reload_queue(self):
 		self.queue = []

@@ -1,4 +1,5 @@
 import os
+import shutil
 import ctypes
 import traceback
 from bLib.helper import *
@@ -10,6 +11,13 @@ exists = os.path.exists
 join = os.path.join
 isdir = os.path.isdir
 isfile = os.path.isfile
+
+def rename_files(path):
+	for i, fname in enumerate(os.listdir(path)):
+		fpath = join(path, fname)
+		if isfile(fpath):
+			dpath = join(path, str(i))
+			shutil.move(fpath, dpath)
 
 def readfile(path):
 	try:

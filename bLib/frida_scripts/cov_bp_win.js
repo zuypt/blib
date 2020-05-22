@@ -199,6 +199,9 @@ function addBreakpoint(module, idx)
 			target.writeU8(0xcc)
 		}
 		VirtualProtect(base.add(text_start), text_size, PAGE_EXECUTE_READ, old_protect)
+
+		// we only add breakpoint once per start so delete to save memory
+		delete module_info['block_array']
 		debug('addBreakpoint ' + 'done')
 	}
 	else 
