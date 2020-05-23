@@ -12,11 +12,12 @@ join = os.path.join
 isdir = os.path.isdir
 isfile = os.path.isfile
 
-def rename_files(path):
+def rename_files(path, ext=''):
+	ext = ext.replace('.', '')
 	for i, fname in enumerate(os.listdir(path)):
 		fpath = join(path, fname)
 		if isfile(fpath):
-			dpath = join(path, str(i))
+			dpath = join(path, '{:05d}.{}'.format(i, ext))
 			shutil.move(fpath, dpath)
 
 def readfile(path):

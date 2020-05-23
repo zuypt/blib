@@ -180,9 +180,27 @@ class FuzzServer(ABC):
 		while self.running:
 			_fuzz_one()
 
-	# @abstractmethod
-	# def _fuzz_one(self):
-	# 	pass
+	def fuzz_one(self, buf):
+		'''
+		TODO: implement timeout
+		'''
+		
+		self.prepare_inp(buf)
+		fault = self.client.exec_one(20000)
+		if fault == FAULT_NONE:
+			if self.client.has_new_cov():
+				self.logger.info('new path')
+				self.found_new_interesting_inp(buf)
+				self.logger.info('hitcount: %d' % self.client.get_hitcount())
+		elif fault == FAULT_TMOUT:
+			self.logger.info('new hang')
+			self.found_new_hang(buf)
+
+		elif fault == FAULT_CRASH or fault == FAULT_ERROR:
+			self.logger.info('new crash')
+			self.found_new_crash(buf)
+
+		return fault
 
 	@abstractmethod
 	def prepare_inp(self, buf):
@@ -252,6 +270,9 @@ class FuzzServer(ABC):
 			if self.client.has_new_cov():
 				testcase = self.add_sync_file_to_queue(full_path)
 				self.logger.info('sync ' + str(testcase))
+
+			if not self.running:
+				break
 
 	def sync(self):
 		for dirname in os.listdir(self.syn_dir):

@@ -70,22 +70,6 @@ class Server(FuzzServer):
 		self.logger.info('dryrun finished')
 		self.logger.info('hitcount: %d' % self.client.get_hitcount())
 
-	def fuzz_one(self, buf):
-		fault = self.client.exec_one(20000)
-		if fault == FAULT_NONE:
-			if self.client.has_new_cov():
-				self.logger.info('new path')
-				self.found_new_interesting_inp(buf)
-				self.logger.info('hitcount: %d' % self.client.get_hitcount())
-		elif fault == FAULT_TMOUT:
-			self.logger.info('new hang')
-			self.found_new_hang(buf)
-
-		elif fault == FAULT_CRASH or fault == FAULT_ERROR:
-			self.logger.info('new crash')
-			self.found_new_crash(buf)
-
-		return fault
 	def _fuzz_loop(self):
 		self.logger.info('fuzz loop')
 
@@ -103,8 +87,6 @@ class Server(FuzzServer):
 					break
 
 				buf = self.mutator.havoc(orig_bytes[:])
-				self.prepare_inp(buf)
-
 				fault = self.fuzz_one(buf)
 				if fault == FAULT_TMOUT:
 					break
