@@ -301,6 +301,7 @@ class BreakpointClient(FridaClient):
 				self.module_infos.append(module_info)
 
 		self.shm_name = '%s' % self.id
+		self.logger.info('map size {}'.format(self.bb_count))
 		self.shm = create_shm(self.shm_name + '_MAP', self.bb_count)
 		self.hitcount = create_shm(self.shm_name + '_HITCOUNT', 4)
 

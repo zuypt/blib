@@ -18,8 +18,8 @@ args = ['test.exe', inp_path, 'loop']
 
 options = {
 	'id': sys.argv[1],
-	'idir': 'in',
-	'odir': 'out',
+	'idir': 'in_test',
+	'odir': 'out_test',
 	'target_module': 'test.exe',
 	'target_offset': 0x1000,
 	'cov_modules': ['test.exe'],
@@ -57,7 +57,7 @@ class Server(FuzzServer):
 			self.prepare_inp(testcase.read())
 
 			fault = self.client.exec_one(INFINITE)
-			if fault == FAULT_CRASH or FAUT_ERROR:
+			if fault == FAULT_CRASH or fault == FAULT_ERROR:
 				self.logger.info('testcase cause crash')
 				return FUZZER_STOP
 			elif fault == FAULT_TMOUT:
@@ -81,7 +81,7 @@ class Server(FuzzServer):
 			self.logger.info('new hang')
 			self.found_new_hang(buf)
 
-		elif fault == FAULT_CRASH or FAUT_ERROR:
+		elif fault == FAULT_CRASH or fault == FAULT_ERROR:
 			self.logger.info('new crash')
 			self.found_new_crash(buf)
 

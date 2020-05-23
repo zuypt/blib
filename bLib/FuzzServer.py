@@ -53,6 +53,7 @@ class FuzzServer(ABC):
 		
 		self.last_new_crash = None
 		self.last_new_hang = None
+		self.last_new_path = None
 
 		self.new_interesting_inp_count = 0
 		self.nexecs = 0
@@ -112,6 +113,7 @@ class FuzzServer(ABC):
 		f.write(buf)
 		f.close()
 		self.queue.append(Testcase(self.queuedir, fname))
+		self.last_new_path = time.time()
 
 	def found_new_crash(self, buf):
 		f = open(join(self.crashdir, 'crash_%d'%self.crash_count), 'wb')
@@ -128,6 +130,8 @@ class FuzzServer(ABC):
 		self.last_new_hang = time.time()
 		
 	def print_info(self):
+		if self.last_new_path:
+			self.logger.info('last new path: {}'.format(time.ctime(self.last_new_path)))
 		if self.last_new_hang:
 			self.logger.info('last new hang: {}'.format(time.ctime(self.last_new_hang)))
 		if self.last_new_crash:
