@@ -22,8 +22,8 @@ options = {
 	'odir': 'out_aac',
 	'target_module': 'aac.exe',
 	'target_offset': 0x10a0,
-	'cov_modules': ['MSAudDecMFT.dll', 'mfreadwrite.dll'],
-	'module_info_files': ['msauddecmft.bbs', 'mfreadwrite.bbs'],
+	'cov_modules': ['MSAudDecMFT.dll', 'mfsrcsnk.dll'],
+	'module_info_files': ['msauddecmft.bbs', 'mfsrcsnk.bbs'],
 	'inp_path': inp_path
 }
 
