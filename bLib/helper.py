@@ -55,7 +55,6 @@ def locate_diffs(data1, data2):
 			l_loc = i
 	return f_loc, l_loc
 
-
 def AFL_choose_block_len(limit):
 	# Caps on block sizes for cloning and deletion operations. Each of these
 	# ranges has a 33% probability of getting picked, except for the first
@@ -285,7 +284,7 @@ def is_not_interesting(value, new_value, num_bytes, le):
 				return False
 
 			#if num_bytes > 2:
-			tval = (value & ~(0xffff << (i * 8))) | (swap_16(interesting_16_Bit[j]) << (i * 8));
+			tval = (value & ~(0xffff << (i * 8))) | (swap_16(interesting_16_Bit[j]) << (i * 8))
 			if new_value == tval:
 				return False
 

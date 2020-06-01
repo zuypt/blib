@@ -7,7 +7,7 @@ from bLib.const import *
 from bLib import radamsa
 
 class Mutator():
-	def __init__(self, executor, **options):
+	def __init__(self, client, **options):
 		self.logger = logging.getLogger('bMutator')
 		self.log_level = options.get('log_level', logging.DEBUG)
 		self.logger.setLevel(self.log_level)
@@ -19,7 +19,7 @@ class Mutator():
 		self.trim_min_bytes   = options.get('trim_min_bytes', TRIM_MIN_BYTES)
 
 		self.map_sz   = options.get('map_sz', MAP_SZ)
-		self.executor = executor
+		self.client = client
 
 	def stop(self):
 		self.running = False
@@ -75,7 +75,7 @@ class Mutator():
 				fix the timeout
 				execute the new testcase
 				'''
-				fault = self.executor.exec_one(buf, 10*1000)
+				fault = self.client.exec_one(buf, 10*1000)
 				
 				cksum = self.client.hash32()
 				self.logger.debug('cksum: %x' % cksum)
@@ -111,7 +111,7 @@ class Mutator():
 		f.close()
 
 		first_trace = malloc(self.map_sz)
-		fault = self.executor.exec_one(testcase.read(), 10*1000)
+		fault = self.client.exec_one(testcase.read(), 10*1000)
 		if fault != FAULT_NONE:
 			return fault
 
@@ -155,7 +155,7 @@ class Mutator():
 				fix the timeout
 				execute the new testcase
 				'''
-				fault = self.executor.exec_one(buf, 10*1000)
+				fault = self.client.exec_one(buf, 10*1000)
 				if fault != FAULT_NONE:
 					return fault
 
@@ -191,7 +191,7 @@ class Mutator():
 		# crash testbin in 30 mins
 		use_stacking = 1 << RAND(AFL_HAVOC_STACK_POW2)
 
-		for i in range (0, use_stacking):
+		for _ in range (0, use_stacking):
 			method = RAND(len(func_to_choose))
 			# randomly select one of the available methods
 			data = func_to_choose[method](data)
