@@ -12,6 +12,14 @@ static OVERLAPPED pipe_overlapped;    /* Overlapped structure of pipe     */
 
 #define EXPORT __declspec(dllexport)
 
+void PRINT_ERROR()
+{
+	DWORD err = GetLastError();
+	LPCSTR err_msg = NULL;
+	FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, (LPSTR)&err_msg, 0, NULL);
+	MessageBoxA(NULL, err_msg, "GetLastError", MB_OK|MB_ICONWARNING);
+}
+
 EXPORT BOOL SetupPipe(char* pipe_name)
 {
 	pipe = CreateNamedPipe(
@@ -26,12 +34,9 @@ EXPORT BOOL SetupPipe(char* pipe_name)
 		NULL					  // default security attribute
 	);
 
-	if (pipe == INVALID_HANDLE_VALUE) {
-		DWORD err = GetLastError();
-		LPCSTR err_msg = NULL;
-		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, (LPSTR)&err_msg, 0, NULL);
-		MessageBoxA(NULL, err_msg, "GetLastError", MB_OK|MB_ICONWARNING);
-
+	if (pipe == INVALID_HANDLE_VALUE)
+	{
+		PRINT_ERROR();
 		return FALSE;
 	}
 	return TRUE;

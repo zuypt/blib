@@ -29,6 +29,7 @@ var OPTIONS = null
 var setup_pipe = null
 var ReadCommandFromPipe = null
 var WriteCommandToPipe = null
+var SetMemoryLimit = null
 var MessageBox = null
 
 var ExitProcess = null;
@@ -50,9 +51,15 @@ rpc.exports = {
 		//debug(stringify(OPTIONS))
 		if (Process.arch == 'x64') Module.load(OPTIONS['libpath64'] + '\\winafl_util_cli.dll')
 		else Module.load(OPTIONS['libpath32'] + '\\winafl_util_cli.dll')
+
 		setup_pipe 					= new NativeFunction(Module.getExportByName('winafl_util_cli', 'setup_pipe'), 'bool', ['pointer'])
 		ReadCommandFromPipe 		= new NativeFunction(Module.getExportByName('winafl_util_cli', 'ReadCommandFromPipe'), 'char', [])
 		WriteCommandToPipe 			= new NativeFunction(Module.getExportByName('winafl_util_cli', 'WriteCommandToPipe'), 'void', ['char'])
+		SetMemoryLimit 				= new NativeFunction(Module.getExportByName('winafl_util_cli', 'SetMemoryLimit'), 'bool', ['uint32'])
+
+		// TODO:
+		// allow changing memory limit
+		SetMemoryLimit(500)
 
 		Process.enumerateModulesSync(
 		{
