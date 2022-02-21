@@ -178,7 +178,7 @@ class FuzzServer(ABC):
 	@abstractmethod
 	def _fuzz_loop(self):
 		while self.running:
-			_fuzz_one()
+			fuzz_one()
 
 	def fuzz_one(self, buf):
 		'''

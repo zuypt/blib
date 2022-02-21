@@ -9,3 +9,4 @@ test/build32/
 test/build64/
 test/bCov_bp_test/*.mp3
 bLib/test/bCov_bp_test/mp3/
+.vscode

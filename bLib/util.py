@@ -12,13 +12,24 @@ join = os.path.join
 isdir = os.path.isdir
 isfile = os.path.isfile
 
-def rename_files(path, ext=''):
+def rename_corpus(path, ext=''):
 	ext = ext.replace('.', '')
 	for i, fname in enumerate(os.listdir(path)):
 		fpath = join(path, fname)
 		if isfile(fpath):
 			dpath = join(path, '{:05d}.{}'.format(i, ext))
 			shutil.move(fpath, dpath)
+
+def fill_struct(is_qword = False, sz = 1024):
+	r = ''
+	if is_qword:
+		pref = 'QWORD'
+	else:
+		pref = 'DWORD'
+
+	for i in range(sz):
+		r += pref + ' a%d;\n'%i
+	return r
 
 def readfile(path):
 	try:
